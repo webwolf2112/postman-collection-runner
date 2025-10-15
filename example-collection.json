@@ -1,0 +1,236 @@
+{
+	"info": {
+		"_postman_id": "12345678-1234-1234-1234-123456789abc",
+		"name": "Variable Sharing Example Collection",
+		"description": "This collection demonstrates how to share variables between endpoints using pre-request and post-request scripts. It includes three endpoints with two having pre/post scripts to show variable sharing.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Create User (with Pre/Post Scripts)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Pre-request Script for Create User endpoint",
+							"// Set a collection variable that will be available to all requests",
+							"pm.collectionVariables.set('requestTimestamp', new Date().toISOString());",
+							"",
+							"// Set an environment variable (if environment is selected)",
+							"pm.environment.set('currentEndpoint', 'Create User');",
+							"",
+							"// Generate a random user ID to be used in the request",
+							"const randomUserId = Math.floor(Math.random() * 10000);",
+							"pm.collectionVariables.set('userId', randomUserId);",
+							"",
+							"console.log('Pre-request: User ID generated:', randomUserId);",
+							"console.log('Pre-request: Request timestamp:', pm.collectionVariables.get('requestTimestamp'));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Post-request Script (Tests) for Create User endpoint",
+							"// Test that the request was successful",
+							"pm.test('Status code is 201', function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"// Extract data from the response and store in variables",
+							"if (pm.response.code === 201) {",
+							"    const responseJson = pm.response.json();",
+							"    ",
+							"    // Store the created user ID as a collection variable",
+							"    pm.collectionVariables.set('createdUserId', responseJson.id);",
+							"    ",
+							"    // Store user name for use in subsequent requests",
+							"    pm.collectionVariables.set('userName', responseJson.name);",
+							"    ",
+							"    console.log('Post-request: Created user ID:', responseJson.id);",
+							"    console.log('Post-request: User name:', responseJson.name);",
+							"}",
+							"",
+							"// Test that variables are being shared",
+							"pm.test('Collection variables are set', function () {",
+							"    pm.expect(pm.collectionVariables.get('requestTimestamp')).to.not.be.undefined;",
+							"    pm.expect(pm.collectionVariables.get('userId')).to.not.be.undefined;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"John Doe\",\n    \"username\": \"johndoe{{userId}}\",\n    \"email\": \"john.doe{{userId}}@example.com\",\n    \"phone\": \"123-456-7890\",\n    \"website\": \"example.com\"\n}"
+				},
+				"url": {
+					"raw": "https://jsonplaceholder.typicode.com/users",
+					"protocol": "https",
+					"host": [
+						"jsonplaceholder",
+						"typicode",
+						"com"
+					],
+					"path": [
+						"users"
+					]
+				},
+				"description": "This endpoint creates a new user. The pre-request script generates a random user ID and sets collection variables. The post-request script validates the response and stores the created user information for use in subsequent requests."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Get User Details (with Pre/Post Scripts)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Pre-request Script for Get User Details endpoint",
+							"// Retrieve the user ID that was set by the previous request",
+							"const userId = pm.collectionVariables.get('userId') || 1;",
+							"",
+							"// Update the current endpoint variable",
+							"pm.environment.set('currentEndpoint', 'Get User Details');",
+							"",
+							"// Log what variables we're using from the previous request",
+							"console.log('Pre-request: Using userId from collection variables:', userId);",
+							"console.log('Pre-request: Request timestamp from previous request:', pm.collectionVariables.get('requestTimestamp'));",
+							"",
+							"// Set a request-specific variable",
+							"pm.collectionVariables.set('getUserRequestTime', new Date().toISOString());"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Post-request Script (Tests) for Get User Details endpoint",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Validate that we received user data",
+							"pm.test('Response has user data', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData).to.have.property('name');",
+							"    pm.expect(jsonData).to.have.property('email');",
+							"});",
+							"",
+							"// Store additional data from the response",
+							"const responseData = pm.response.json();",
+							"pm.collectionVariables.set('userEmail', responseData.email);",
+							"pm.collectionVariables.set('userPhone', responseData.phone);",
+							"",
+							"console.log('Post-request: User email stored:', responseData.email);",
+							"console.log('Post-request: User phone stored:', responseData.phone);",
+							"",
+							"// Demonstrate that variables from the first request are still accessible",
+							"pm.test('Variables from previous requests are accessible', function () {",
+							"    pm.expect(pm.collectionVariables.get('requestTimestamp')).to.not.be.undefined;",
+							"    pm.expect(pm.collectionVariables.get('userId')).to.not.be.undefined;",
+							"    console.log('Verified: Variables from Create User request are still available');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://jsonplaceholder.typicode.com/users/{{userId}}",
+					"protocol": "https",
+					"host": [
+						"jsonplaceholder",
+						"typicode",
+						"com"
+					],
+					"path": [
+						"users",
+						"{{userId}}"
+					]
+				},
+				"description": "This endpoint retrieves user details using the userId variable set by the first request. It demonstrates how variables are shared between requests. The pre-request script retrieves the shared variable, and the post-request script stores additional user information."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Get User Posts (no scripts)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://jsonplaceholder.typicode.com/users/{{userId}}/posts",
+					"protocol": "https",
+					"host": [
+						"jsonplaceholder",
+						"typicode",
+						"com"
+					],
+					"path": [
+						"users",
+						"{{userId}}",
+						"posts"
+					]
+				},
+				"description": "This endpoint retrieves all posts for a user. It uses the shared userId variable from the first request but doesn't have pre/post scripts. This demonstrates that all requests in the collection can access shared collection variables, even without scripts."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "userId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "requestTimestamp",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "createdUserId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userEmail",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userPhone",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "getUserRequestTime",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
