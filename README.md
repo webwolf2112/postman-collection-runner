@@ -30,9 +30,12 @@ postman-collection-runner/
 │       │   ├── pre-script.js          # Clear variables
 │       │   └── post-script.js         # Extract random Pokemon
 │       ├── get-pokemon-details/       # Get Pokemon request
-│       │   └── post-script.js         # Extract random ability
-│       └── get-ability-details/       # Get Ability request
-│           └── post-script.js         # Format and display results
+│       │   └── post-script.js         # Extract random ability + type
+│       ├── get-ability-details/       # Get Ability request
+│       │   └── post-script.js         # Format and display results
+│       └── get-type-details/          # Bonus: Get Type request
+│           ├── pre-script.js          # Read local variable
+│           └── post-script.js         # Verify damage relations
 └── collections/                       # Postman collections
     └── pokemon-collection.json        # Pokemon API example collection
 ```

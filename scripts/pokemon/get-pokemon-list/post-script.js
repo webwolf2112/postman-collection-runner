@@ -17,7 +17,17 @@ if (pm.response.code === 200) {
     }
 
 }
-// else {
-//     console.error(`Get Pokemon List failed with status ${pm.response.code}`);
-//     pm.execution.setNextRequest(null);
-// }
+else {
+    console.error(`Get Pokemon List failed with status ${pm.response.code}`);
+    pm.execution.setNextRequest(null);
+}
+
+// --- Tests ---
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+
+pm.test("Response contains a non-empty results array", function () {
+    const jsonData = pm.response.json();
+    pm.expect(jsonData.results).to.be.an("array").that.is.not.empty;
+});

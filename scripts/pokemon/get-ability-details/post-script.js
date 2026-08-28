@@ -42,5 +42,13 @@ if (pm.response.code === 200) {
     console.log("⭐⭐⭐⭐⭐⭐⭐");
 }
 
+// --- Tests ---
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
 
-
+pm.test("English effect entry was found", function () {
+    const jsonData = pm.response.json();
+    const englishEffectEntry = jsonData.effect_entries.find(entry => entry.language.name === "en");
+    pm.expect(englishEffectEntry, "No English effect_entries found").to.exist;
+});
