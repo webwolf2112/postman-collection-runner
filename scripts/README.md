@@ -1,20 +1,21 @@
 # Postman Scripts
 
-This folder contains ready-to-use JavaScript scripts for Postman Collection Runner. These scripts are organized by functionality and can be copied directly into Postman's Pre-request Script or Tests (Post-script) tabs.
+This file explains how the example JavaScript scripts used across this repo's video series are organized and how to use them. These scripts are organized by functionality and can be copied directly into Postman's Pre-request Script or Tests (Post-script) tabs.
 
-## 📁 Folder Structure
+The actual scripts live alongside each video's collection and docs, under [`Postman Collections and Variables/`](../Postman%20Collections%20and%20Variables/), so that each video has its own self-contained, unmodified snapshot. For example:
 
 ```
-scripts/
-├── README.md                           # This file
-└── pokemon/                           # Pokemon API example scripts
-    ├── get-pokemon-list/              # First request scripts
-    │   ├── pre-script.js              # Clear variables
-    │   └── post-script.js             # Extract random Pokemon name
-    ├── get-pokemon-details/           # Second request scripts
-    │   └── post-script.js             # Extract random ability
-    └── get-ability-details/           # Third request scripts
-        └── post-script.js             # Format and display results
+Postman Collections and Variables/
+└── 01-dynamic-collection-variables/
+    └── scripts/
+        └── pokemon/                    # Pokemon API example scripts
+            ├── get-pokemon-list/       # First request scripts
+            │   ├── pre-script.js       # Clear variables
+            │   └── post-script.js      # Extract random Pokemon name
+            ├── get-pokemon-details/    # Second request scripts
+            │   └── post-script.js      # Extract random ability
+            └── get-ability-details/    # Third request scripts
+                └── post-script.js      # Format and display results
 ```
 
 ## 🚀 How to Use

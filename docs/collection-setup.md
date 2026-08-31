@@ -17,20 +17,20 @@ This guide will walk you through setting up your Postman collection for the Poke
 - **Method:** GET
 - **URL:** `https://pokeapi.co/api/v2/pokemon`
 - **Name:** "1. Get Pokemon List"
-- **Pre-request Script:** [See scripts/pokemon/get-pokemon-list/pre-script.js](../scripts/pokemon/get-pokemon-list/pre-script.js)
-- **Tests:** [See scripts/pokemon/get-pokemon-list/post-script.js](../scripts/pokemon/get-pokemon-list/post-script.js)
+- **Pre-request Script:** [See get-pokemon-list/pre-script.js](../Postman%20Collections%20and%20Variables/01-dynamic-collection-variables/scripts/pokemon/get-pokemon-list/pre-script.js)
+- **Tests:** [See get-pokemon-list/post-script.js](../Postman%20Collections%20and%20Variables/01-dynamic-collection-variables/scripts/pokemon/get-pokemon-list/post-script.js)
 
 #### Request 2: Get Pokemon Details
 - **Method:** GET
 - **URL:** `https://pokeapi.co/api/v2/pokemon/{{randomPokemonName}}`
 - **Name:** "2. Get Pokemon Details"
-- **Tests:** [See scripts/pokemon/get-pokemon-details/post-script.js](../scripts/pokemon/get-pokemon-details/post-script.js)
+- **Tests:** [See get-pokemon-details/post-script.js](../Postman%20Collections%20and%20Variables/01-dynamic-collection-variables/scripts/pokemon/get-pokemon-details/post-script.js)
 
 #### Request 3: Get Ability Details
 - **Method:** GET
 - **URL:** `https://pokeapi.co/api/v2/ability/{{randomPokemonAbility}}`
 - **Name:** "3. Get Ability Details"
-- **Tests:** [See scripts/pokemon/get-ability-details/post-script.js](../scripts/pokemon/get-ability-details/post-script.js)
+- **Tests:** [See get-ability-details/post-script.js](../Postman%20Collections%20and%20Variables/01-dynamic-collection-variables/scripts/pokemon/get-ability-details/post-script.js)
 
 ### Step 3: Configure Collection Runner
 

@@ -46,4 +46,4 @@ The process involves just 3 simple steps:
 
 ---
 
-*Ready to get started? Head to the [Detailed Tutorial](tutorial.md) to begin!*
+*Ready to get started? Head to the [Detailed Tutorial](../Postman%20Collections%20and%20Variables/01-dynamic-collection-variables/docs/tutorial.md) to begin!*
