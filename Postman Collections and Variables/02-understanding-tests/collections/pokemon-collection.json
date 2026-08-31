@@ -1,0 +1,430 @@
+{
+	"info": {
+		"_postman_id": "pokemon-data-population",
+		"name": "Pokemon Data Population with Tests",
+		"description": "Automated Pokemon data population using Collection Runner with pre and post scripts",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Get Pokemon List",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Pre Script: to clear out any created variables",
+							"",
+							"pm.collectionVariables.unset(\"randomPokemonName\");",
+							"pm.collectionVariables.unset(\"randomPokemonAbility\");",
+							"pm.collectionVariables.unset(\"randomPokemonType\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check if the response was successful (HTTP 200)",
+							"",
+							"if (pm.response.code === 200) {",
+							"    // Parse the JSON response body",
+							"    const responseJson = pm.response.json();",
+							"    // Access the array of results",
+							"    const resultsArray = responseJson.results; ",
+							"",
+							"    // Proceed if a results array exists and is not empty",
+							"    if (resultsArray && resultsArray.length > 0) {",
+							"        // Generate a random index and get that name from the array ",
+							"        const randomIndex = Math.floor(Math.random() * resultsArray.length);",
+							"        const pokemonName = resultsArray[randomIndex]?.name;",
+							"",
+							"        // Set the collectionVariables variable",
+							"        pm.collectionVariables.set(\"randomPokemonName\", pokemonName);",
+							"    }",
+							"",
+							"}",
+							"else {",
+							"    console.error(`Get Pokemon List failed with status ${pm.response.code}`);",
+							"    pm.execution.setNextRequest(null);",
+							"}",
+							"",
+							"// --- Tests ---",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains a non-empty results array\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.results).to.be.an(\"array\").that.is.not.empty;",
+							"});",
+							"",
+							"// Comparing against the local pokemonName variable would be circular —",
+							"// that's the exact value we just fed into set(). Checking against the",
+							"// response's own results array instead proves the stored value is a real",
+							"// Pokémon name from this list, not just any string.",
+							"pm.test(\"randomPokemonName collection variable matches a name in the response\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const names = jsonData.results.map((entry) => entry.name);",
+							"    pm.expect(names).to.include(pm.collectionVariables.get(\"randomPokemonName\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://pokeapi.co/api/v2/pokemon",
+					"protocol": "https",
+					"host": [
+						"pokeapi",
+						"co"
+					],
+					"path": [
+						"api",
+						"v2",
+						"pokemon"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Get Pokemon Details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check if the response was successful (HTTP 200)",
+							"if (pm.response.code === 200) {",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    const resultsArray = responseJson.abilities; ",
+							"    ",
+							"    // Check if the array is not empty",
+							"    if (resultsArray && resultsArray.length > 0) {",
+							"        const randomIndex = Math.floor(Math.random() * resultsArray.length);",
+							"        const pokemonAbility = resultsArray[randomIndex].ability.name;",
+							"        // Set the collectionVariables variable (persists until unset or overridden)",
+							"        pm.collectionVariables.set(\"randomPokemonAbility\", pokemonAbility);",
+							"    }",
+							"",
+							"    const typesArray = responseJson.types;",
+							"    // Check if the array is not empty",
+							"    if (typesArray && typesArray.length > 0) {",
+							"        const randomTypeIndex = Math.floor(Math.random() * typesArray.length);",
+							"        const pokemonType = typesArray[randomTypeIndex].type.name;",
+							"        // Set the collectionVariables variable (persists until unset or overridden)",
+							"        pm.collectionVariables.set(\"randomPokemonType\", pokemonType);",
+							"    }",
+							"}",
+							"else {",
+							"    console.error(`Get Pokemon Details failed with status ${pm.response.code}`);",
+							"    pm.execution.setNextRequest(null);",
+							"}",
+							"",
+							"// --- Tests ---",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains a non-empty abilities array\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.abilities).to.be.an(\"array\").that.is.not.empty;",
+							"});",
+							"",
+							"// Comparing against the local pokemonAbility/pokemonType variables would be",
+							"// circular — that's the exact value we just fed into set(). Checking",
+							"// against the response's own arrays instead proves the stored value is a",
+							"// real ability/type this Pokémon actually has, not just any string.",
+							"pm.test(\"randomPokemonAbility collection variable matches an ability in the response\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const abilityNames = jsonData.abilities.map((entry) => entry.ability.name);",
+							"    pm.expect(abilityNames).to.include(pm.collectionVariables.get(\"randomPokemonAbility\"));",
+							"});",
+							"",
+							"pm.test(\"randomPokemonType collection variable matches a type in the response\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const typeNames = jsonData.types.map((entry) => entry.type.name);",
+							"    pm.expect(typeNames).to.include(pm.collectionVariables.get(\"randomPokemonType\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://pokeapi.co/api/v2/pokemon/{{randomPokemonName}}",
+					"protocol": "https",
+					"host": [
+						"pokeapi",
+						"co"
+					],
+					"path": [
+						"api",
+						"v2",
+						"pokemon",
+						"{{randomPokemonName}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. Get Ability Details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check if the response was successful (HTTP 200)",
+							"if (pm.response.code === 200) {",
+							"    // --- 1. Gather Data ---",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    // 1a. Get data from Postman Variables (using the 'or' operator for a safe default)",
+							"    const pokemonName = pm.collectionVariables.get(\"randomPokemonName\") || \"Bulbasaur\";",
+							"",
+							"    // 1b. Read Ability Name and ID from the response",
+							"    const abilityName = responseJson.name;",
+							"    const abilityId = responseJson.id;",
+							"",
+							"    // 1c. Filter for the English effect entry (the main short description)",
+							"    const englishEffectEntry = responseJson.effect_entries.find(entry => entry.language.name === \"en\");",
+							"",
+							"    // 1d. Filter for the latest English flavor text (the long description)",
+							"    // We reverse the array and find the first English entry, which is usually the newest/latest",
+							"    const latestFlavorTextEntry = responseJson.flavor_text_entries",
+							"        .reverse()",
+							"        .find(entry => entry.language.name === \"en\");",
+							"",
+							"    // 1e. Clean and combine the required data into a single object",
+							"    const standardizedOutput = {",
+							"        // 1. Pokémon Name (from previous request)",
+							"        \"Pokemon Name\": pokemonName, ",
+							"        // 2. Ability Name (from current request)",
+							"        \"Ability\": abilityName,",
+							"        // 4. Short Effect Text (from effect_entries)",
+							"        \"Effect\": englishEffectEntry ? englishEffectEntry.short_effect : \"N/A\",",
+							"        // 5. Flavor Text (long description)",
+							"        \"Additional Info\": latestFlavorTextEntry ? latestFlavorTextEntry.flavor_text.replace(/\\n/g, ' ').trim() : \"N/A\"",
+							"    };",
+							"",
+							"    // --- 2. Log to Console for Runner Output ---",
+							"    // Log a separator for easy finding",
+							"    console.log(\"⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐\");",
+							"",
+							"    for (const [key, value] of Object.entries(standardizedOutput)) {",
+							"        // Log the key and the value separated by a colon",
+							"        console.log(`${key}: ${value}`);",
+							"    }",
+							"    console.log(\"⭐⭐⭐⭐⭐⭐⭐\");",
+							"}",
+							"",
+							"// --- Tests ---",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"English effect entry was found\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const englishEffectEntry = jsonData.effect_entries.find(entry => entry.language.name === \"en\");",
+							"    pm.expect(englishEffectEntry, \"No English effect_entries found\").to.exist;",
+							"});",
+							"",
+							"// --- Collection variable (set by the previous request's Post Script) ---",
+							"// Real shared state — the ability name was picked randomly, so this is",
+							"// the only reliable way to know which one we actually got back.",
+							"const actualAbilityName = pm.collectionVariables.get(\"randomPokemonAbility\");",
+							"",
+							"// --- Local variable (scoped to THIS script only) ---",
+							"// Only exists for this one test — never saved to the collection, never",
+							"// passed to another request. A checklist of fields we always expect to",
+							"// see, regardless of which ability was randomly picked.",
+							"const requiredFields = [\"name\", \"id\", \"effect_entries\", \"flavor_text_entries\", \"pokemon\"];",
+							"",
+							"pm.test(\"Ability name matches the ability that was actually requested\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.name).to.eql(actualAbilityName);",
+							"});",
+							"",
+							"pm.test(\"Response includes all required fields\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    requiredFields.forEach((field) => {",
+							"        pm.expect(jsonData).to.have.property(field);",
+							"    });",
+							"});",
+							"",
+							"// --- The finale: cross-check data integrity across the whole chain ---",
+							"// By this point in the run, both collection variables already had to exist",
+							"// just to make this request — {{randomPokemonAbility}} is in the URL. So",
+							"// checking they're \"not empty\" proves nothing new. What's actually worth",
+							"// asserting: does the API agree the Pokemon from request 2 really has the",
+							"// ability from request 3? That's a real correctness check, not a formality.",
+							"pm.test(\"The original Pokemon is listed as having this ability\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const pokemonName = pm.collectionVariables.get(\"randomPokemonName\");",
+							"    const pokemonNamesWithThisAbility = jsonData.pokemon.map((entry) => entry.pokemon.name);",
+							"    pm.expect(pokemonNamesWithThisAbility).to.include(pokemonName);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://pokeapi.co/api/v2/ability/{{randomPokemonAbility}}",
+					"protocol": "https",
+					"host": [
+						"pokeapi",
+						"co"
+					],
+					"path": [
+						"api",
+						"v2",
+						"ability",
+						"{{randomPokemonAbility}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Get Type Details",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// --- Local variable: track when the request was sent ---",
+							"// This needs to survive from this pre-request script to the test script",
+							"// below, but nowhere else — it has to be set fresh before every single",
+							"// request, since a stale timestamp would make the timing check meaningless.",
+							"// That's exactly what pm.variables (local, per-request scope) is for:",
+							"// unlike a collection variable, there's nothing to unset() and nothing that",
+							"// can leak into the next run.",
+							"pm.variables.set(\"requestStartTime\", Date.now());"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Read back the local variable the pre-request script set before sending",
+							"// the request. Since it's local (not a collection variable), it's",
+							"// guaranteed to be from THIS request — nothing stale, nothing left over",
+							"// from a previous run.",
+							"pm.test(\"Response arrived within a reasonable time\", function () {",
+							"    const requestStartTime = Number(pm.variables.get(\"requestStartTime\"));",
+							"    const elapsed = Date.now() - requestStartTime;",
+							"",
+							"    pm.expect(elapsed, \"round trip should complete quickly\").to.be.below(5000);",
+							"});",
+							"",
+							"// randomPokemonType was chained forward from Get Pokemon Details, two",
+							"// requests back, so it has to be collection-scoped — this request never",
+							"// picks its own type, it just verifies the one selected earlier.",
+							"pm.test(\"Type name in response matches the chained variable\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const expectedType = pm.collectionVariables.get(\"randomPokemonType\");",
+							"    pm.expect(jsonData.name).to.eql(expectedType);",
+							"});",
+							"",
+							"// PokeAPI always returns exactly these 6 damage-relation categories for",
+							"// every type. This list never changes and has nothing to do with data",
+							"// flowing between scripts, so it's just a plain const here.",
+							"const expectedDamageRelationKeys = [",
+							"    \"no_damage_to\",",
+							"    \"half_damage_to\",",
+							"    \"double_damage_to\",",
+							"    \"no_damage_from\",",
+							"    \"half_damage_from\",",
+							"    \"double_damage_from\"",
+							"];",
+							"",
+							"pm.test(\"damage_relations has exactly the expected categories\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const actualKeys = Object.keys(jsonData.damage_relations).sort();",
+							"    pm.expect(actualKeys).to.eql(expectedDamageRelationKeys.sort());",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://pokeapi.co/api/v2/type/{{randomPokemonType}}",
+					"protocol": "https",
+					"host": [
+						"pokeapi",
+						"co"
+					],
+					"path": [
+						"api",
+						"v2",
+						"type",
+						"{{randomPokemonType}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "randomPokemonName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "randomPokemonAbility",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "randomPokemonType",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
