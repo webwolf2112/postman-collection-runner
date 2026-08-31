@@ -66,6 +66,10 @@ const requiredFields = ["name", "id", "effect_entries", "flavor_text_entries", "
 
 pm.test("Ability name matches the ability that was actually requested", function () {
     const jsonData = pm.response.json();
+    // Guard first: if either side is empty, eql(undefined, undefined) would
+    // pass without ever proving we got a real ability back.
+    pm.expect(actualAbilityName, "randomPokemonAbility collection variable was never set").to.be.a("string").and.not.empty;
+    pm.expect(jsonData.name, "Response has no name — did this hit the ability list instead of a single ability?").to.be.a("string").and.not.empty;
     pm.expect(jsonData.name).to.eql(actualAbilityName);
 });
 

@@ -253,6 +253,10 @@
 							"",
 							"pm.test(\"Ability name matches the ability that was actually requested\", function () {",
 							"    const jsonData = pm.response.json();",
+							"    // Guard first: if either side is empty, eql(undefined, undefined) would",
+							"    // pass without ever proving we got a real ability back.",
+							"    pm.expect(actualAbilityName, \"randomPokemonAbility collection variable was never set\").to.be.a(\"string\").and.not.empty;",
+							"    pm.expect(jsonData.name, \"Response has no name — did this hit the ability list instead of a single ability?\").to.be.a(\"string\").and.not.empty;",
 							"    pm.expect(jsonData.name).to.eql(actualAbilityName);",
 							"});",
 							"",
@@ -301,7 +305,7 @@
 			"response": []
 		},
 		{
-			"name": "4. Get Type Details",
+			"name": "4. Get Ability With Date",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -338,31 +342,15 @@
 							"    pm.expect(elapsed, \"round trip should complete quickly\").to.be.below(5000);",
 							"});",
 							"",
-							"// randomPokemonType was chained forward from Get Pokemon Details, two",
-							"// requests back, so it has to be collection-scoped — this request never",
-							"// picks its own type, it just verifies the one selected earlier.",
-							"pm.test(\"Type name in response matches the chained variable\", function () {",
-							"    const jsonData = pm.response.json();",
-							"    const expectedType = pm.collectionVariables.get(\"randomPokemonType\");",
-							"    pm.expect(jsonData.name).to.eql(expectedType);",
-							"});",
+							"// Read the request body back (not the response) to prove the value",
+							"// actually sent matches what the pre-request script generated.",
+							"pm.test(\"Ensure we pass the correct date\", function () {",
+							"    const rawBodyText = pm.request.body.raw;",
+							"    const requestData = JSON.parse(rawBodyText);",
 							"",
-							"// PokeAPI always returns exactly these 6 damage-relation categories for",
-							"// every type. This list never changes and has nothing to do with data",
-							"// flowing between scripts, so it's just a plain const here.",
-							"const expectedDamageRelationKeys = [",
-							"    \"no_damage_to\",",
-							"    \"half_damage_to\",",
-							"    \"double_damage_to\",",
-							"    \"no_damage_from\",",
-							"    \"half_damage_from\",",
-							"    \"double_damage_from\"",
-							"];",
+							"    console.log('request', requestData)",
 							"",
-							"pm.test(\"damage_relations has exactly the expected categories\", function () {",
-							"    const jsonData = pm.response.json();",
-							"    const actualKeys = Object.keys(jsonData.damage_relations).sort();",
-							"    pm.expect(actualKeys).to.eql(expectedDamageRelationKeys.sort());",
+							"    pm.expect(requestData.currentDate).to.equal(pm.variables.get(\"requestStartTime\"));",
 							"});"
 						],
 						"type": "text/javascript"
@@ -373,7 +361,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://pokeapi.co/api/v2/type/{{randomPokemonType}}",
+					"raw": "https://pokeapi.co/api/v2/ability/{{randomPokemonAbility}}",
 					"protocol": "https",
 					"host": [
 						"pokeapi",
@@ -382,9 +370,18 @@
 					"path": [
 						"api",
 						"v2",
-						"type",
-						"{{randomPokemonType}}"
+						"ability",
+						"{{randomPokemonAbility}}"
 					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"currentDate\": {{requestStartTime}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
 				}
 			},
 			"response": []
