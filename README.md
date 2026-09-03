@@ -26,7 +26,7 @@ More episodes get added here as the series continues — check the [channel](htt
 ## 📁 Project Structure
 
 ```
-postman-collection-runner/
+VanessasDevLab/
 ├── README.md                           # This file
 ├── docs/                              # General reference (not tied to one video)
 │   ├── README.md                      # Documentation overview
