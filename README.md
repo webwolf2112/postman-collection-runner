@@ -7,6 +7,7 @@ Demo code for [Vanessa's Dev Lab](https://www.youtube.com/@VanessasDevLab) on Yo
 | Series | Folder |
 |---|---|
 | Postman Collections and Variables | [`Postman Collections and Variables/`](Postman%20Collections%20and%20Variables/) |
+| Digital Business Card (standalone) | [`Digital Business Card/`](Digital%20Business%20Card/) |
 
 Check the [channel](https://www.youtube.com/@VanessasDevLab) for the full playlist. New series get added as their own top-level folder as the channel grows.
 
