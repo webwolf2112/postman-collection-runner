@@ -16,6 +16,9 @@ Build me a digital business card page with a button that saves my contact
 info directly to someone's phone as a vCard file, plus a QR code that
 links to the page.
 
+* Save the preview file to this folder: Desktop
+* Name the preview file: business-card.html
+
 MY DETAILS
 - Name: [YOUR NAME]
 - Title: [YOUR JOB TITLE]
